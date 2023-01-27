@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SingleSelectionModel;
@@ -26,11 +27,14 @@ public class MineSweeperApplication extends Application {
     public static int FIELD_SIZE = 25;
     private static Field[][] grid;
     public static int countBomb = 0;
+    int count = 0;
 
     @FXML
     ChoiceBox choiceBox;
+    @FXML
+    Button checkButton;
 
-    boolean choiceSet = false;
+    public boolean choiceSet = false;
     @FXML
     AnchorPane anchorField;
     @FXML
@@ -44,6 +48,21 @@ public class MineSweeperApplication extends Application {
     }
 
 
+    @FXML
+    public void checkButtonClicked () {
+        boolean check = false;
+        for (int x = 0; x < Y_FIELD; x++) {
+            for (int y = 0; y < X_FIELD; y++) {
+                Field field = grid[x][y];
+                if (!field.bomb) {
+                    ArrayList<Field> fields = getNeighbours(grid[x][y]);
+                    if (field.bomb && field.isOpenedField()) System.out.println("YOU LOST");
+                    else count++;
+                }
+            }
+        }
+        if (count == ((X_FIELD*Y_FIELD) - Field.getBombshidden())) System.out.println();
+    }
 
     @FXML
     public void choiceBoxClicked () {
@@ -51,21 +70,19 @@ public class MineSweeperApplication extends Application {
             SingleSelectionModel selectionModel = choiceBox.getSelectionModel();
             int index = selectionModel.getSelectedIndex();
             System.out.println(index);
+            root.getChildren().clear();
             switch (index) {
                 case 0 -> {
-                    root.getChildren().clear();
                     Y_FIELD = 8;
                     X_FIELD = 8;
                     FIELD_SIZE = 50;
                 }
                 case 1 -> {
-                    root.getChildren().clear();
                     Y_FIELD = 16;
                     X_FIELD = 16;
                     FIELD_SIZE = 25;
                 }
                 case 2 -> {
-                    root.getChildren().clear();
                     Y_FIELD = 20;
                     X_FIELD = 20;
                     FIELD_SIZE = 20;
@@ -76,21 +93,25 @@ public class MineSweeperApplication extends Application {
     }
 
 
-
+    /**
+     * In this Method the Gamefield is created. Besides that the neighbours of a field are created to check
+     * for bombs (for the bombcount)
+     */
     private void createContent () {
         //Pane root = new Pane();
         root.setPrefSize(400, 400);
         grid= new Field[X_FIELD][Y_FIELD];
 
         anchorField.getChildren().add(root);
-
         if (!choiceSet) {
             choiceBox.setValue("16x16");
             choiceBox.getItems().addAll("8x8", "16x16", "20x20");
             choiceSet=true;
         }
 
-
+        /**
+         * Create field
+         */
     // Spielfeld mit Zufallsbomben wird generiert
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
