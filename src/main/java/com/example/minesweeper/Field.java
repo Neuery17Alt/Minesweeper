@@ -2,6 +2,7 @@ package com.example.minesweeper;
 
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -31,6 +32,13 @@ public class Field extends StackPane {
     private ArrayList<Integer> arrXBomb = new ArrayList<>();
     private ArrayList<Integer> arrYBomb = new ArrayList<>();
 
+    public boolean isBomb() {
+        return bomb;
+    }
+
+    public boolean isOpenedField () {
+        return openedField;
+    }
 
     public int getX() {
         return x;
@@ -51,7 +59,7 @@ public class Field extends StackPane {
         openedField = false;
         if (bomb) {
             bombshidden++;
-            text="x";
+            text="X";
             arrXBomb.add(x);
             arrYBomb.add(y);
         }
@@ -98,14 +106,12 @@ public class Field extends StackPane {
                 MineSweeperApplication.getNeighbours(this).forEach(Field::open);
             } else if (bombCount.getText().equals("X")) {
                 fieldNode.setFill(Color.RED);
+                System.exit(0);
+            }
+            if (MineSweeperApplication.checkifGamevictory()) {
+                System.out.println("YOU WIN");
             }
         }
 
-    }
-
-    
-
-    public boolean isOpenedField() {
-        return true;
     }
 }

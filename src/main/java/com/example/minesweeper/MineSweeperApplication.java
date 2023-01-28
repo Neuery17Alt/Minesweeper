@@ -12,12 +12,11 @@ import javafx.scene.control.SingleSelectionModel;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.ArrayList;
-
-
 
 
 public class MineSweeperApplication extends Application {
@@ -31,8 +30,6 @@ public class MineSweeperApplication extends Application {
 
     @FXML
     ChoiceBox choiceBox;
-    @FXML
-    Button checkButton;
 
     public boolean choiceSet = false;
     @FXML
@@ -40,32 +37,42 @@ public class MineSweeperApplication extends Application {
     @FXML
     AnchorPane anchorFieldMain;
     public static Pane root;
+    @FXML
+    public static Label gameStatus;
 
     @FXML
-    public void initialize () {
+    public void initialize() {
         root = new Pane();
         createContent();
     }
 
-
-    @FXML
-    public void checkButtonClicked () {
-        boolean check = false;
-        for (int x = 0; x < Y_FIELD; x++) {
-            for (int y = 0; y < X_FIELD; y++) {
+    public static boolean checkifGamevictory() {
+        boolean checkwinner = true;
+        for (int y = 0; y < Y_FIELD; y++) {
+            for (int x = 0; x < X_FIELD; x++) {
                 Field field = grid[x][y];
-                if (!field.bomb) {
-                    ArrayList<Field> fields = getNeighbours(grid[x][y]);
-                    if (field.bomb && field.isOpenedField()) System.out.println("YOU LOST");
-                    else count++;
+                if (!field.isOpenedField() && !field.isBomb()) {
+                    checkwinner = false;
+                    break;
                 }
             }
         }
-        if (count == ((X_FIELD*Y_FIELD) - Field.getBombshidden())) System.out.println();
+        return checkwinner;
     }
 
+    public static void setGameStatus (String text) {
+        gameStatus.setText(text);
+    }
+
+    /**
+     * Resets the Game and resizes the Gamegrid when the choiceBox-Choice is changed. Options are:
+     *      8x8 Grid
+     *      16x16 Grid
+     *      20x20 Grid
+     * Then the game is intialized (created) again!
+     */
     @FXML
-    public void choiceBoxClicked () {
+    public void choiceBoxClicked() {
         choiceBox.setOnAction((event) -> {
             SingleSelectionModel selectionModel = choiceBox.getSelectionModel();
             int index = selectionModel.getSelectedIndex();
@@ -88,7 +95,7 @@ public class MineSweeperApplication extends Application {
                     FIELD_SIZE = 20;
                 }
             }
-           initialize();
+            initialize();
         });
     }
 
@@ -97,38 +104,43 @@ public class MineSweeperApplication extends Application {
      * In this Method the Gamefield is created. Besides that the neighbours of a field are created to check
      * for bombs (for the bombcount)
      */
-    private void createContent () {
+    private void createContent() {
         //Pane root = new Pane();
         root.setPrefSize(400, 400);
-        grid= new Field[X_FIELD][Y_FIELD];
+        grid = new Field[X_FIELD][Y_FIELD];
 
         anchorField.getChildren().add(root);
         if (!choiceSet) {
             choiceBox.setValue("16x16");
             choiceBox.getItems().addAll("8x8", "16x16", "20x20");
-            choiceSet=true;
+            choiceSet = true;
         }
 
         /**
-         * Create field
+         * Creates the field where every grid gets created seperatly and
+         * with a 20% Bombfield chance
          */
-    // Spielfeld mit Zufallsbomben wird generiert
+        // Spielfeld mit Zufallsbomben wird generiert
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
-                Field field = new Field(x, y, Math.random() < 0.2);
+                Field field = new Field(x, y, Math.random() < 0.01);
                 grid[x][y] = field;
                 root.getChildren().add(field);
             }
         }
 
+
+        /**
+         * Counts the Bombs around every fieldnode field and sets the bombcount after that
+         */
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
                 Field field = grid[x][y];
-                if (!field.bomb){
+                if (!field.bomb) {
                     int count = 0;
                     ArrayList<Field> fields = getNeighbours(grid[x][y]);
 
-                    for (Field f:fields) {
+                    for (Field f : fields) {
                         if (f.bomb) count++;
                     }
                     if (count > 0) {
@@ -139,14 +151,18 @@ public class MineSweeperApplication extends Application {
         }
     }
 
-    static ArrayList<Field> getNeighbours (Field field) {
+    /**
+     * makes every field around a field a neighbour and saves position
+     * of the neighbours to count the bombs around a field
+     */
+    static ArrayList<Field> getNeighbours(Field field) {
         ArrayList<Field> neighbours = new ArrayList<>();
 
-        int[] points = new int[] {-1,-1, -1,0, -1,1, 0,1, 1,1, 1,0, 1,-1, 0,-1};
+        int[] points = new int[]{-1, -1, -1, 0, -1, 1, 0, 1, 1, 1, 1, 0, 1, -1, 0, -1};
 
-        for (int i = 0; i<points.length; i++) {
+        for (int i = 0; i < points.length; i++) {
             int dx = points[i];
-            int dy = points[i+1];
+            int dy = points[i + 1];
 
             int newX = field.getX() + dx;
             int newY = field.getY() + dy;
@@ -159,12 +175,6 @@ public class MineSweeperApplication extends Application {
 
         return neighbours;
     }
-
-
-
-
-
-
 
 
     @Override
