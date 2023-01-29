@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 
+
 public class MineSweeperApplication extends Application {
 
     private static int X_FIELD = 16;
@@ -31,6 +32,14 @@ public class MineSweeperApplication extends Application {
     @FXML
     ChoiceBox choiceBox;
 
+    @FXML
+    Label flagField;
+    @FXML
+    Label timerLabel;
+
+    @FXML
+    Button resetButton;
+
     public boolean choiceSet = false;
     @FXML
     AnchorPane anchorField;
@@ -38,7 +47,9 @@ public class MineSweeperApplication extends Application {
     AnchorPane anchorFieldMain;
     public static Pane root;
     @FXML
-    public static Label gameStatus;
+    public Label gameStatus;
+
+    int bombCount = 0;
 
     @FXML
     public void initialize() {
@@ -60,8 +71,12 @@ public class MineSweeperApplication extends Application {
         return checkwinner;
     }
 
-    public static void setGameStatus (String text) {
-        gameStatus.setText(text);
+    @FXML
+    public void resetButtonClicked (){
+        resetButton.setDisable(true);
+        root.getChildren().clear();
+        resetButton.setDisable(false);
+        initialize();
     }
 
     /**
@@ -95,6 +110,7 @@ public class MineSweeperApplication extends Application {
                     FIELD_SIZE = 20;
                 }
             }
+            bombCount = 0;
             initialize();
         });
     }
@@ -123,7 +139,7 @@ public class MineSweeperApplication extends Application {
         // Spielfeld mit Zufallsbomben wird generiert
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
-                Field field = new Field(x, y, Math.random() < 0.01);
+                Field field = new Field(x, y, Math.random() < 0.2);
                 grid[x][y] = field;
                 root.getChildren().add(field);
             }
@@ -146,9 +162,12 @@ public class MineSweeperApplication extends Application {
                     if (count > 0) {
                         field.setBombCount(Integer.toString(count));
                     }
+                } else {
+                    bombCount++;
                 }
             }
         }
+        flagField.setText(""+bombCount);
     }
 
     /**

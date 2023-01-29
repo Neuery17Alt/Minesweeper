@@ -1,8 +1,6 @@
 package com.example.minesweeper;
 
 
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -10,18 +8,15 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Field extends StackPane {
     private int x, y;
     public boolean bomb;
-    private int count = 0;
-    private String text;
+    private String text = "";
     public Text bombCount = new Text();
     private Rectangle fieldNode = null;
     private boolean openedField;
     private boolean flagSet = false;
-    private boolean winner =false;
 
     public static int getBombshidden() {
         return bombshidden;
