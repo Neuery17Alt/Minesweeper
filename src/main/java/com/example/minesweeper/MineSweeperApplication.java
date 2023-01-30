@@ -203,10 +203,6 @@ public class MineSweeperApplication extends Application {
         return MineSweeperApplication.getInstance().gameStatus.getText();
     }
 
-    private void Load () {
-        SleepClass sleepClass = new SleepClass();
-        sleepClass.test(this);
-    }
     /**
      * makes every field around a field a neighbour and saves position
      * of the neighbours to count the bombs around a field
