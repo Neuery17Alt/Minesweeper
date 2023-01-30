@@ -24,17 +24,14 @@ import static java.lang.Thread.sleep;
 
 public class MineSweeperApplication extends Application {
 
-    private static int X_FIELD = 16;
-    private static int Y_FIELD = 16;
+    public static int X_FIELD = 16;
+    public static int Y_FIELD = 16;
     public static int FIELD_SIZE = 25;
     private static Field[][] grid;
-    public static int countBomb = 0;
+    private static int countBomb = 0;
     int count = 0;
 
     private static MineSweeperApplication instance;
-    public MineSweeperApplication() {
-        instance = this;
-    }
 
     @FXML
     ChoiceBox choiceBox;
@@ -45,25 +42,49 @@ public class MineSweeperApplication extends Application {
     Label timerLabel;
     @FXML
     Label gameStatus;
-
     @FXML
     Button resetButton;
 
-    public boolean choiceSet = false;
+    private boolean choiceSet = false;
     @FXML
     AnchorPane anchorField;
     @FXML
     AnchorPane anchorFieldMain;
-    public static Pane root;
+    private static Pane root;
 
-    int bombCount = 0;
+    private int bombCount = 0;
 
+    /**
+     * Sets the instance
+     */
+    public MineSweeperApplication() {
+        instance = this;
+    }
+
+    /**
+     * Creates the new anchorPane where the anchorPane for the gameField is placed on
+     */
     @FXML
     public void initialize() {
         root = new Pane();
         createContent();
     }
 
+    /**
+     * If the "Reset"-Button is clicked this method is called and resets the field (grid)
+     * then generates a new one!
+     */
+    @FXML
+    public void resetButtonClicked (){
+        root.getChildren().clear();
+        initialize();
+    }
+
+    /**
+     * If a field is opened it calls this method, which checks for the winner:
+     *      -if every field, which isnt a bomb, is opened the player won
+     *      -if a field, with a bomb in it, is opened the player lost
+     */
     public static boolean checkifGamevictory() {
         boolean checkwinner = true;
         for (int y = 0; y < Y_FIELD; y++) {
@@ -78,20 +99,13 @@ public class MineSweeperApplication extends Application {
         return checkwinner;
     }
 
-    @FXML
-    public void resetButtonClicked (){
-        resetButton.setDisable(true);
-        root.getChildren().clear();
-        resetButton.setDisable(false);
-        initialize();
-    }
 
     /**
      * Resets the Game and resizes the Gamegrid when the choiceBox-Choice is changed. Options are:
-     *      8x8 Grid
-     *      16x16 Grid
-     *      20x20 Grid
-     * Then the game is intialized (created) again!
+     *      8x8 Grid (Beginner)
+     *      16x16 Grid (Medium)
+     *      20x20 Grid (Advanced)
+     * Then the field is gets reseted and the game is initialized (created) again!
      */
     @FXML
     public void choiceBoxClicked() {
@@ -124,8 +138,7 @@ public class MineSweeperApplication extends Application {
 
 
     /**
-     * In this Method the Gamefield is created. Besides that the neighbours of a field are created to check
-     * for bombs (for the bombcount)
+     * In this Method the Gamefield is created and all the default values (e.g. gameStatus) are set
      */
     private void createContent() {
         gameStatus.setText("...");
@@ -142,12 +155,12 @@ public class MineSweeperApplication extends Application {
 
         /**
          * Creates the field where every grid gets created seperatly and
-         * with a 20% Bombfield chance
+         * with a 20% Bombfield chance!
          */
         // Spielfeld mit Zufallsbomben wird generiert
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
-                Field field = new Field(x, y, Math.random() < 0.2);
+                Field field = new Field(x, y, Math.random() < 0.01);
                 grid[x][y] = field;
                 root.getChildren().add(field);
             }
@@ -155,7 +168,7 @@ public class MineSweeperApplication extends Application {
 
 
         /**
-         * Counts the Bombs around every fieldnode field and sets the bombcount after that
+         * Counts the Bombs around every fieldnode and sets the bombcount after that
          */
 
         bombCount=0;
@@ -180,6 +193,9 @@ public class MineSweeperApplication extends Application {
         flagField.setText(""+bombCount);
     }
 
+    /**
+     * This Method is to calculate the available Flags after placing one and after it resets the field.
+     */
     public static void calcFlag (boolean check) {
         int anzahl = Integer.parseInt(MineSweeperApplication.getInstance().flagField.getText());
         if (check) {
@@ -190,6 +206,11 @@ public class MineSweeperApplication extends Application {
         MineSweeperApplication.getInstance().flagField.setText(""+anzahl);
     }
 
+    /**
+     * If all Fields who aren´t bombs are opened it sets the Label "gameStatus" to "YOU WIN" but if you open a field
+     * with a bomb in it the label "gameStatus" will be set to "YOU LOSE"
+     */
+
     public static void setWinner(boolean check) {
         if (check) {
             MineSweeperApplication.getInstance().gameStatus.setText("YOU WIN");
@@ -198,14 +219,16 @@ public class MineSweeperApplication extends Application {
         }
     }
 
+    /**
+     * Getter for the Label "gameStatus"
+     */
     public static String getGameStatus() {
-
         return MineSweeperApplication.getInstance().gameStatus.getText();
     }
 
     /**
-     * makes every field around a field a neighbour and saves position
-     * of the neighbours to count the bombs around a field
+     * This method makes every field around a field a neighbour and saves position
+     * of the neighbours to be able to count the bombs around a field later
      */
     static ArrayList<Field> getNeighbours(Field field) {
         ArrayList<Field> neighbours = new ArrayList<>();
@@ -227,6 +250,10 @@ public class MineSweeperApplication extends Application {
 
         return neighbours;
     }
+
+    /**
+     * If I get a NullpointerException I can use the Instance to fix it
+     */
 
     public static MineSweeperApplication getInstance() {
         if (instance == null) {

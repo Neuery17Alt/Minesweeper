@@ -72,21 +72,6 @@
                   <Font name="Rockwell Bold" size="30.0" />
                </font>
             </Label>
-            <Label layoutX="6.0" layoutY="284.0" text="TIMER" textFill="WHITE">
-               <font>
-                  <Font name="Rockwell Bold" size="25.0" />
-               </font>
-            </Label>
-            <Label layoutX="4.0" layoutY="284.0" text="TIMER" textFill="#ede8e8">
-               <font>
-                  <Font name="Rockwell Bold" size="25.0" />
-               </font>
-            </Label>
-            <Label fx:id="timerLabel" layoutX="71.0" layoutY="320.0" text="Label" textFill="#fffefe">
-               <font>
-                  <Font size="25.0" />
-               </font>
-            </Label>
          </children>
       </AnchorPane>
       <Label layoutX="-43.0" layoutY="267.0" text="Label" />

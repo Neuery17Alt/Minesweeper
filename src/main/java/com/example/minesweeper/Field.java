@@ -7,27 +7,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 
-import java.util.ArrayList;
-
-import static java.lang.Thread.sleep;
-
 public class Field extends StackPane {
-    private int x, y;
     public boolean bomb;
+    private int x, y;
     private String text = "";
-    public Text bombCount = new Text();
-    private Rectangle fieldNode = null;
+    private Text bombCount;
+    private Rectangle fieldNode;
     private boolean openedField;
     private boolean flagSet = false;
 
-    public static int getBombshidden() {
-        return bombshidden;
-    }
-
-    private static int bombshidden = 0;
-
-    private ArrayList<Integer> arrXBomb = new ArrayList<>();
-    private ArrayList<Integer> arrYBomb = new ArrayList<>();
+    /**
+     * Getter & Setter
+     */
 
     public boolean isBomb() {
         return bomb;
@@ -49,23 +40,30 @@ public class Field extends StackPane {
         this.bombCount.setText(bombCount);
     }
 
+    /**
+     * Class-Constructer
+     */
     public Field (int x, int y, boolean bomb) {
         this.x = x;
         this.y = y;
         this.bomb = bomb;
         openedField = false;
         if (bomb) {
-            bombshidden++;
             text="X";
-            arrXBomb.add(x);
-            arrYBomb.add(y);
         }
 
+        /**
+         * This Part makes every grid a Rectangle with the FIELD_SIZE and colors
+         * (colors edges, colors field) them right away
+         */
         fieldNode = new Rectangle(MineSweeperApplication.FIELD_SIZE, MineSweeperApplication.FIELD_SIZE);
         fieldNode.setFill(Color.BLACK);
         fieldNode.setStroke(Color.PURPLE);
         fieldNode.setVisible(true);
 
+        /**
+         * This Section styles the bombfields and listens if a mousebutton is pressed
+         */
         bombCount = new Text();
         bombCount.setVisible(false);
         bombCount.setText(this.bomb ? "X" : "");
@@ -78,10 +76,17 @@ public class Field extends StackPane {
     }
 
 
+    /**
+     * This Method is called when a mousebutton is pressed, after that it checks what Button (Left/Right) is clicked!
+     *      -If the left Mousbutton is clicked it will call the open method which opens a fieldnode
+     *       (uncovers the bombCount).
+     *      -If the right Mousbutton is clicked it sets a flag (colors the fieldnode yellow) on the fieldnode so that you cant
+     *       open it anymore unless you remove the flag by right-clicking again!
+     */
     public void checkMouseButton (MouseButton e) {
-        if (e.equals(MouseButton.PRIMARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE")) {
+        if (e.equals(MouseButton.PRIMARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE") && !MineSweeperApplication.getGameStatus().equals("YOU WIN")) {
             open();
-        } else if (e.equals(MouseButton.SECONDARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE")) {
+        } else if (e.equals(MouseButton.SECONDARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE") && !MineSweeperApplication.getGameStatus().equals("YOU WIN")) {
             if (!flagSet && !this.openedField) {
                 fieldNode.setFill(Color.YELLOW);
                 flagSet=true;
@@ -92,9 +97,12 @@ public class Field extends StackPane {
                 MineSweeperApplication.calcFlag(flagSet);
             }
         }
-
     }
 
+    /**
+     * This method opens the fieldnode (lets you see the bombcount) and checks for the winner right away. If the fieldnode
+     * is opened, the fieldnode gets the style according to the content of it
+     */
     public void open () {
         if (!fieldNode.getFill().equals(Color.YELLOW)) {
             if (this.openedField) return;
