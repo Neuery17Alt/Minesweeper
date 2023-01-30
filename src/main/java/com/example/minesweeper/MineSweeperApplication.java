@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.SingleSelectionModel;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -18,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import static java.lang.Thread.sleep;
 
 
 public class MineSweeperApplication extends Application {
@@ -29,6 +31,11 @@ public class MineSweeperApplication extends Application {
     public static int countBomb = 0;
     int count = 0;
 
+    private static MineSweeperApplication instance;
+    public MineSweeperApplication() {
+        instance = this;
+    }
+
     @FXML
     ChoiceBox choiceBox;
 
@@ -36,6 +43,8 @@ public class MineSweeperApplication extends Application {
     Label flagField;
     @FXML
     Label timerLabel;
+    @FXML
+    Label gameStatus;
 
     @FXML
     Button resetButton;
@@ -46,8 +55,6 @@ public class MineSweeperApplication extends Application {
     @FXML
     AnchorPane anchorFieldMain;
     public static Pane root;
-    @FXML
-    public Label gameStatus;
 
     int bombCount = 0;
 
@@ -121,14 +128,15 @@ public class MineSweeperApplication extends Application {
      * for bombs (for the bombcount)
      */
     private void createContent() {
+        gameStatus.setText("...");
         //Pane root = new Pane();
         root.setPrefSize(400, 400);
         grid = new Field[X_FIELD][Y_FIELD];
 
         anchorField.getChildren().add(root);
         if (!choiceSet) {
-            choiceBox.setValue("16x16");
-            choiceBox.getItems().addAll("8x8", "16x16", "20x20");
+            choiceBox.setValue("Medium (16x16)");
+            choiceBox.getItems().addAll("Beginner (8x8)", "Medium (16x16)", "Advanced (20x20)");
             choiceSet = true;
         }
 
@@ -149,6 +157,8 @@ public class MineSweeperApplication extends Application {
         /**
          * Counts the Bombs around every fieldnode field and sets the bombcount after that
          */
+
+        bombCount=0;
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
                 Field field = grid[x][y];
@@ -170,6 +180,33 @@ public class MineSweeperApplication extends Application {
         flagField.setText(""+bombCount);
     }
 
+    public static void calcFlag (boolean check) {
+        int anzahl = Integer.parseInt(MineSweeperApplication.getInstance().flagField.getText());
+        if (check) {
+            anzahl--;
+        } else {
+            anzahl++;
+        }
+        MineSweeperApplication.getInstance().flagField.setText(""+anzahl);
+    }
+
+    public static void setWinner(boolean check) {
+        if (check) {
+            MineSweeperApplication.getInstance().gameStatus.setText("YOU WIN");
+        } else {
+            MineSweeperApplication.getInstance().gameStatus.setText("YOU LOSE");
+        }
+    }
+
+    public static String getGameStatus() {
+
+        return MineSweeperApplication.getInstance().gameStatus.getText();
+    }
+
+    private void Load () {
+        SleepClass sleepClass = new SleepClass();
+        sleepClass.test(this);
+    }
     /**
      * makes every field around a field a neighbour and saves position
      * of the neighbours to count the bombs around a field
@@ -193,6 +230,13 @@ public class MineSweeperApplication extends Application {
         }
 
         return neighbours;
+    }
+
+    public static MineSweeperApplication getInstance() {
+        if (instance == null) {
+            instance = new MineSweeperApplication();
+        }
+        return instance;
     }
 
 

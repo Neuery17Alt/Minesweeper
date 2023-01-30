@@ -9,6 +9,8 @@ import javafx.scene.text.Text;
 
 import java.util.ArrayList;
 
+import static java.lang.Thread.sleep;
+
 public class Field extends StackPane {
     private int x, y;
     public boolean bomb;
@@ -77,17 +79,20 @@ public class Field extends StackPane {
 
 
     public void checkMouseButton (MouseButton e) {
-        if (e.equals(MouseButton.PRIMARY)) {
+        if (e.equals(MouseButton.PRIMARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE")) {
             open();
-        } else if (e.equals(MouseButton.SECONDARY)) {
+        } else if (e.equals(MouseButton.SECONDARY) && !MineSweeperApplication.getGameStatus().equals("YOU LOSE")) {
             if (!flagSet && !this.openedField) {
                 fieldNode.setFill(Color.YELLOW);
                 flagSet=true;
+                MineSweeperApplication.calcFlag(flagSet);
             } else if (flagSet && !this.openedField){
                 fieldNode.setFill(Color.BLACK);
                 flagSet=false;
+                MineSweeperApplication.calcFlag(flagSet);
             }
         }
+
     }
 
     public void open () {
@@ -101,12 +106,12 @@ public class Field extends StackPane {
                 MineSweeperApplication.getNeighbours(this).forEach(Field::open);
             } else if (bombCount.getText().equals("X")) {
                 fieldNode.setFill(Color.RED);
-                System.exit(0);
+                MineSweeperApplication.setWinner(false);
             }
             if (MineSweeperApplication.checkifGamevictory()) {
-                System.out.println("YOU WIN");
+                MineSweeperApplication.setWinner(true);
             }
         }
-
     }
+
 }
