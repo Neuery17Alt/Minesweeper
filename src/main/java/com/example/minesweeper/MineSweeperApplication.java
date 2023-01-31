@@ -188,7 +188,7 @@ public class MineSweeperApplication extends Application {
         // Spielfeld mit Zufallsbomben wird generiert
         for (int y = 0; y < Y_FIELD; y++) {
             for (int x = 0; x < X_FIELD; x++) {
-                Field field = new Field(x, y, Math.random() < 0.01);
+                Field field = new Field(x, y, Math.random() < 0.2);
                 grid[x][y] = field;
                 root.getChildren().add(field);
             }
